@@ -10,7 +10,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.stream.Stream;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -21,27 +21,29 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     public AuthenticationResponse register(RegisterRequest request) {
+
         var user = User.builder()
                 .firstname(request.getFirstname())
                 .lastname(request.getLastname())
-                .email(request.getEmail()) //TODO email check
+                .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.USER)
                 .build();
-        userRepository.save(user);
+        var checkEmail = userRepository.findByEmail(user.getEmail());
+        if(checkEmail.isPresent()) {
+            var userEmail = checkEmail.get();
+            if (Objects.equals(user.getEmail(), userEmail.getEmail())) {
+                return AuthenticationResponse.builder().message("A user with such an email has already been created").build();
+            }
+        }
+            userRepository.save(user);
+
         var jwtToken = jwtService.generateToken(user);
         return AuthenticationResponse.builder()
                 .token(jwtToken)
+                .message("User has been created")
                 .build();
     }
-
-//    private String emailCheck(String email) {
-//        if(email.equals("egor.saprykin.03@mail.ru")){
-//            return new Throwable().getMessage();
-//        }
-//        return email;
-//    }
-
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         authenticationManager.authenticate(

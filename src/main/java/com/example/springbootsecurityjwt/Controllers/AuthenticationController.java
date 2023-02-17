@@ -1,5 +1,9 @@
-package com.example.springbootsecurityjwt.auth;
+package com.example.springbootsecurityjwt.Controllers;
 
+import com.example.springbootsecurityjwt.auth.AuthenticationRequest;
+import com.example.springbootsecurityjwt.auth.AuthenticationResponse;
+import com.example.springbootsecurityjwt.auth.AuthenticationService;
+import com.example.springbootsecurityjwt.auth.RegisterRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
